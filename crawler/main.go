@@ -3,6 +3,7 @@ package main
 import (
 	"learngo/crawler/config"
 	"learngo/crawler/engine"
+	"learngo/crawler/persist"
 	"learngo/crawler/scheduler"
 	"learngo/crawler/zhenai/parser"
 )
@@ -24,17 +25,17 @@ func main() {
 	//	Url: config.StartUrl,
 	//	ParserFunc: parser.ParseCityList,
 	//})
-
+	itemChan, err := persist.ItemSaver("dating_profile")
+	if err != nil {
+		panic(err)
+	}
 	e := engine.ConcurrentEngine{
 		Scheduler:   &scheduler.QueuedScheduler{},
 		WorkerCount: 100,
+		ItemChan:    itemChan,
 	}
 	e.Run(engine.Request{
-		Url: config.StartUrl,
+		Url:        config.StartUrl,
 		ParserFunc: parser.ParseCityList,
 	})
-	//e.Run(engine.Request{
-	//	Url:        "https://www.zhenai.com/zhenghun/beijing",
-	//	ParserFunc: parser.ParseCity,
-	//})
 }

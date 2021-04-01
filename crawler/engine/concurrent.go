@@ -1,12 +1,9 @@
 package engine
 
-import (
-	"log"
-)
-
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
+	ItemChan    chan Item
 }
 
 type Scheduler interface {
@@ -32,12 +29,13 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 		e.Scheduler.Submit(r)
 	}
 
-	itemCount := 0
+	//itemCount := 0
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			log.Printf("Got item: #%d, %v", itemCount, item)
-			itemCount++
+			go func() { e.ItemChan <- item }()
+			//log.Printf("Got item: #%d, %v", itemCount, item)
+			//itemCount++
 		}
 
 		for _, request := range result.Requests {
@@ -60,4 +58,14 @@ func createWorker(in chan Request,
 			out <- result
 		}
 	}()
+}
+
+var visitedUrls = make(map[string]bool)
+
+func isDuplicated(url string) bool {
+	if visitedUrls[url] {
+		return true
+	}
+	visitedUrls[url] = true
+	return false
 }

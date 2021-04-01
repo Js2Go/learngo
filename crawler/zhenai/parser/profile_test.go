@@ -13,14 +13,14 @@ func TestParseProfile(t *testing.T) {
 		panic(err)
 	}
 
-	result := ParseProfile(contents, "马子", "女性")
+	result := ParseProfile(contents, "", "马子", "女性")
 
 	if len(result.Items) != 1 {
 		t.Errorf("Items should contain 1 "+
 			"element; but was %v", result.Items)
 	}
 
-	profile := result.Items[0].(model.Profile)
+	profile := result.Items[0].Payload.(model.Profile)
 
 	expected := model.Profile{
 		Name:       "马子",
@@ -34,8 +34,8 @@ func TestParseProfile(t *testing.T) {
 		Occupation: "服务业",
 		Hokou:      "毕节 ",
 		Xinzuo:     "天蝎座(10.23-11.21)",
-		House:      "",
-		Car:        "",
+		House:      "已购房",
+		Car:        "已购车",
 	}
 
 	if profile != expected {

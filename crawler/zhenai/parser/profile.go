@@ -3,6 +3,7 @@ package parser
 import (
 	"learngo/crawler/engine"
 	"learngo/crawler/model"
+	"regexp"
 )
 
 //const ageRe = `<div[^>]*class="m-btn purple">([\d]+)岁</div>`
@@ -14,8 +15,10 @@ import (
 //var nRe = regexp.MustCompile(nameRe)
 //var oRe = regexp.MustCompile(ocpRe)
 
+var idUrlRe = regexp.MustCompile(`http://album.zhenai.com/u/([\d]+)`)
+
 func ParseProfile(
-	contents []byte, name, gender string) engine.ParseResult {
+	contents []byte, url, name, gender string) engine.ParseResult {
 	//matches := re.FindAllSubmatch(contents, -1)
 	//nameMatch := nRe.FindSubmatch(contents)
 	//ocpMatch := oRe.FindSubmatch(contents)
@@ -39,8 +42,32 @@ func ParseProfile(
 	}
 
 	result := engine.ParseResult{
-		Items: []interface{}{profile},
+		Items: []engine.Item{
+			{
+				Id: extractString([]byte(url), idUrlRe),
+				Url: url,
+				Type: "zhenai",
+				Payload: profile,
+			},
+		},
 	}
 
 	return result
+}
+
+func extractString(contents []byte, re *regexp.Regexp) string {
+	match := re.FindSubmatch(contents)
+	
+	if len(match) >= 2 {
+		return string(match[1])
+	} else {
+		return ""
+	}
+}
+
+func ProfileParser(
+	name, gender string) engine.ParserFunc {
+	return func(c []byte, url string) engine.ParseResult {
+		return ParseProfile(c, url, name, gender)
+	}
 }

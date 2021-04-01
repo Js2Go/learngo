@@ -14,20 +14,16 @@ var (
 		`href="(http://www.zhenai.com/zhenghun/[^"]+)"`)
 )
 
-func ParseCity(contents []byte) engine.ParseResult {
+func ParseCity(contents []byte, _ string) engine.ParseResult {
 	matches := profileRe.FindAllSubmatch(contents, -1)
-	genderMatch := genderRe.FindSubmatch(contents)
+	matches2 := genderRe.FindAllSubmatch(contents, -1)
 
 	result := engine.ParseResult{}
-	for _, m := range matches {
-		name := string(m[2])
-		gender := string(genderMatch[1])
+	for idx, m := range matches {
 		//result.Items = append(result.Items, "User "+name)
 		result.Requests = append(result.Requests, engine.Request{
-			Url: string(m[1]),
-			ParserFunc: func(c []byte) engine.ParseResult {
-				return ParseProfile(c, name, gender)
-			},
+			Url:        string(m[1]),
+			ParserFunc: ProfileParser(string(m[2]), string(matches2[idx][1])),
 		})
 	}
 

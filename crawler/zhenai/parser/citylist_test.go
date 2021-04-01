@@ -13,7 +13,7 @@ func TestParseCityList(t *testing.T) {
 	}
 
 	//fmt.Printf("%s", contents)
-	results := ParseCityList(contents)
+	results := ParseCityList(contents, "")
 
 	const resultSize = 470
 	expectedUrls := []string{
@@ -42,10 +42,10 @@ func TestParseCityList(t *testing.T) {
 	}
 
 	for i, city := range expectedCities {
-		if results.Items[i].(string) != city {
+		if results.Items[i].Payload.(string) != city {
 			t.Errorf("expected url #%d: %s; but" +
 				"was %s",
-				i, city, results.Items[i].(string))
+				i, city, results.Items[i].Payload.(string))
 		}
 	}
 
