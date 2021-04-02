@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"learngo/functional/fib"
+	"learngo/lang/functional/fib"
 	"strings"
 )
 
