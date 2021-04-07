@@ -66,6 +66,7 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 	}
 }
 
+// unknown parser name error 是因为结构体的名字必须和调用rpc的名字保持一致
 type ParseProfile struct {
 	UserName string
 	Gender string
