@@ -63,7 +63,6 @@ func DeserializeResult(r ParseResult) (engine.ParseResult, error) {
 		Items: r.Items,
 	}
 	for _, req := range r.Requests {
-		fmt.Println(req)
 		engineReq, err := DeserializeRequest(req)
 		if err != nil {
 			log.Printf("error deserialzing "+
@@ -77,7 +76,6 @@ func DeserializeResult(r ParseResult) (engine.ParseResult, error) {
 }
 
 func deserializeParser(p SerializedParser) (engine.Parser, error) {
-	//fmt.Println(p.Name)
 	switch p.Name {
 	case config.ParseCityList:
 		return engine.NewFuncParser(parser.ParseCityList, config.ParseCityList), nil

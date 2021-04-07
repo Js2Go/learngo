@@ -1,11 +1,11 @@
 package main
 
 import (
-	"learngo/crawler/config"
 	"learngo/crawler/engine"
 	"learngo/crawler/persist"
 	"learngo/crawler/scheduler"
 	"learngo/crawler/zhenai/parser"
+	"learngo/crawler_distributed/config"
 )
 
 func main() {
@@ -30,13 +30,13 @@ func main() {
 		panic(err)
 	}
 	e := engine.ConcurrentEngine{
-		Scheduler:   &scheduler.QueuedScheduler{},
-		WorkerCount: 100,
-		ItemChan:    itemChan,
+		Scheduler:        &scheduler.QueuedScheduler{},
+		WorkerCount:      100,
+		ItemChan:         itemChan,
 		RequestProcessor: engine.Worker,
 	}
 	e.Run(engine.Request{
-		Url:        config.StartUrl,
+		Url:    config.StartUrl,
 		Parser: engine.NewFuncParser(parser.ParseCityList, "ParseCityList"),
 	})
 }

@@ -66,24 +66,24 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 	}
 }
 
-type ProfileParser struct {
+type ParseProfile struct {
 	UserName string
 	Gender string
 }
 
-func (p *ProfileParser) Parse(contents []byte, url string) engine.ParseResult {
+func (p *ParseProfile) Parse(contents []byte, url string) engine.ParseResult {
 	return parseProfile(contents, url, p.UserName, p.Gender)
 }
 
-func (p *ProfileParser) Serialize() (name string, args interface{}) {
-	return config.ParseProfile, ProfileParser{
+func (p *ParseProfile) Serialize() (name string, args interface{}) {
+	return config.ParseProfile, ParseProfile{
 		UserName: p.UserName,
 		Gender: p.Gender,
 	}
 }
 
-func NewProfileParser(name string, gender string) *ProfileParser {
-	return &ProfileParser{
+func NewProfileParser(name string, gender string) *ParseProfile {
+	return &ParseProfile{
 		UserName: name,
 		Gender: gender,
 	}

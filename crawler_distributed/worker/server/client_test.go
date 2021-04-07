@@ -24,7 +24,7 @@ func TestCrawlService(t *testing.T) {
 		Url: "http://album.zhenai.com/u/1629062944",
 		Parser: worker.SerializedParser{
 			Name: config.ParseProfile,
-			Args: parser.ProfileParser{
+			Args: parser.ParseProfile{
 				UserName: "马子",
 				Gender:   "女性",
 			},
