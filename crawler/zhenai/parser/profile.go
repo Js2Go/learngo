@@ -3,6 +3,7 @@ package parser
 import (
 	"learngo/crawler/engine"
 	"learngo/crawler/model"
+	"learngo/crawler_distributed/config"
 	"regexp"
 )
 
@@ -17,7 +18,7 @@ import (
 
 var idUrlRe = regexp.MustCompile(`http://album.zhenai.com/u/([\d]+)`)
 
-func ParseProfile(
+func parseProfile(
 	contents []byte, url, name, gender string) engine.ParseResult {
 	//matches := re.FindAllSubmatch(contents, -1)
 	//nameMatch := nRe.FindSubmatch(contents)
@@ -65,9 +66,25 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 	}
 }
 
-func ProfileParser(
-	name, gender string) engine.ParserFunc {
-	return func(c []byte, url string) engine.ParseResult {
-		return ParseProfile(c, url, name, gender)
+type ProfileParser struct {
+	UserName string
+	Gender string
+}
+
+func (p *ProfileParser) Parse(contents []byte, url string) engine.ParseResult {
+	return parseProfile(contents, url, p.UserName, p.Gender)
+}
+
+func (p *ProfileParser) Serialize() (name string, args interface{}) {
+	return config.ParseProfile, ProfileParser{
+		UserName: p.UserName,
+		Gender: p.Gender,
+	}
+}
+
+func NewProfileParser(name string, gender string) *ProfileParser {
+	return &ProfileParser{
+		UserName: name,
+		Gender: gender,
 	}
 }

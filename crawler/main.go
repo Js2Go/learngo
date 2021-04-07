@@ -33,9 +33,10 @@ func main() {
 		Scheduler:   &scheduler.QueuedScheduler{},
 		WorkerCount: 100,
 		ItemChan:    itemChan,
+		RequestProcessor: engine.Worker,
 	}
 	e.Run(engine.Request{
 		Url:        config.StartUrl,
-		ParserFunc: parser.ParseCityList,
+		Parser: engine.NewFuncParser(parser.ParseCityList, "ParseCityList"),
 	})
 }
