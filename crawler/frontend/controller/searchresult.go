@@ -16,6 +16,56 @@ import (
 // TODO
 // support paging
 // add start page
+type SearchResult interface {
+	GetSearchResult(q string, from, size int) (model.SearchResult, error)
+}
+
+type SearchResultNoViewHandler struct {
+	client *elastic.Client
+}
+
+func (h SearchResultNoViewHandler) GetSearchResult(
+	q string, from, size int) (model.SearchRes, error) {
+	var result model.SearchRes
+
+	search := h.client.
+		Search("dating_profile")
+	
+	if q != "" {
+		search = search.
+			Query(elastic.NewQueryStringQuery(
+				rewriteQueryString(q)))
+	}
+	
+	resp, err := search.From(from).
+		Size(size).
+		Do(context.Background())
+	if err != nil {
+		return result, err
+	}
+
+	result.Count = resp.TotalHits()
+
+	for _, v := range resp.Each(reflect.TypeOf(engine.Item{})) {
+		item := v.(engine.Item)
+		result.Data = append(result.Data, item)
+	}
+
+	return result, nil
+}
+
+func CreateSearchResultNoViewHandler() SearchResultNoViewHandler {
+	client, err := elastic.NewClient(
+		elastic.SetSniff(false))
+	if err != nil {
+		panic(err)
+	}
+
+	return SearchResultNoViewHandler{
+		client: client,
+	}
+}
+
 type SearchResultHandler struct {
 	view   view.SearchResultView
 	client *elastic.Client
@@ -44,7 +94,7 @@ func (h SearchResultHandler) ServeHTTP(
 	if err != nil {
 		from = 0
 	}
-	page, err := h.getSearchResult(q, from)
+	page, err := h.GetSearchResult(q, from, 10)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
@@ -56,8 +106,8 @@ func (h SearchResultHandler) ServeHTTP(
 	}
 }
 
-func (h SearchResultHandler) getSearchResult(
-	q string, from int) (model.SearchResult, error) {
+func (h SearchResultHandler) GetSearchResult(
+	q string, from, _ int) (model.SearchResult, error) {
 	var result model.SearchResult
 	result.Query = q
 	resp, err := h.client.

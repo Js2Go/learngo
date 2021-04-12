@@ -19,35 +19,35 @@ import (
 var idUrlRe = regexp.MustCompile(`http://album.zhenai.com/u/([\d]+)`)
 
 func parseProfile(
-	contents []byte, url, name, gender string) engine.ParseResult {
+	contents []byte, url, name, gender, hokou, age, edu, income, mar, height, avatar string) engine.ParseResult {
 	//matches := re.FindAllSubmatch(contents, -1)
 	//nameMatch := nRe.FindSubmatch(contents)
 	//ocpMatch := oRe.FindSubmatch(contents)
 
-
 	//fmt.Println(name, gender)
 	profile := model.Profile{
-		Name:       name,
-		Gender:     gender,
-		//Age:        string(matches[1][1]),
-		//Height:     string(matches[3][1]),
+		Name:      name,
+		Gender:    gender,
+		Age:       age,
+		Height:    height,
+		Income:    income,
+		Marriage:  mar,
+		Education: edu,
+		Hokou:  hokou,
+		Avatar: avatar,
+		//House:  "",
+		//Car:    "",
 		//Weight:     string(matches[4][1]),
-		//Income:     string(matches[6][1]),
-		//Marriage:   string(matches[0][1]),
-		//Education:  string(matches[8][1]),
 		//Occupation: string(matches[7][1]),
-		//Hokou:      string(ocpMatch[1]),
 		//Xinzuo:     string(matches[2][1]),
-		House:      "",
-		Car:        "",
 	}
 
 	result := engine.ParseResult{
 		Items: []engine.Item{
 			{
-				Id: extractString([]byte(url), idUrlRe),
-				Url: url,
-				Type: "zhenai",
+				Id:      extractString([]byte(url), idUrlRe),
+				Url:     url,
+				Type:    "zhenai",
 				Payload: profile,
 			},
 		},
@@ -58,7 +58,7 @@ func parseProfile(
 
 func extractString(contents []byte, re *regexp.Regexp) string {
 	match := re.FindSubmatch(contents)
-	
+
 	if len(match) >= 2 {
 		return string(match[1])
 	} else {
@@ -69,23 +69,47 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 // unknown parser name error 是因为结构体的名字必须和调用rpc的名字保持一致
 type ParseProfile struct {
 	UserName string
-	Gender string
+	Gender   string
+	Hokou    string
+	Age      string
+	Edu      string
+	Income   string
+	Mar      string
+	Height   string
+	Avatar   string
 }
 
 func (p *ParseProfile) Parse(contents []byte, url string) engine.ParseResult {
-	return parseProfile(contents, url, p.UserName, p.Gender)
+	return parseProfile(
+		contents, url, p.UserName, p.Gender, p.Hokou,
+		p.Age, p.Edu, p.Income, p.Mar, p.Height, p.Avatar)
 }
 
 func (p *ParseProfile) Serialize() (name string, args interface{}) {
 	return config.ParseProfile, ParseProfile{
 		UserName: p.UserName,
-		Gender: p.Gender,
+		Gender:   p.Gender,
+		Hokou:    p.Hokou,
+		Age:      p.Age,
+		Edu:      p.Edu,
+		Income:   p.Income,
+		Mar:      p.Mar,
+		Height:   p.Height,
+		Avatar:   p.Avatar,
 	}
 }
 
-func NewProfileParser(name string, gender string) *ParseProfile {
+func NewProfileParser(
+	name, gender, hokou, age, edu, income, mar, height, avatar string) *ParseProfile {
 	return &ParseProfile{
 		UserName: name,
-		Gender: gender,
+		Gender:   gender,
+		Hokou:    hokou,
+		Age:      age,
+		Edu:      edu,
+		Income:   income,
+		Mar:      mar,
+		Height:   height,
+		Avatar:   avatar,
 	}
 }

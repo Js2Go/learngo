@@ -18,10 +18,10 @@ type ParseResult struct {
 type ParserFunc func(contents []byte, url string) ParseResult
 
 type Item struct {
-	Url     string
-	Type    string
-	Id      string
-	Payload interface{}
+	Url     string      `json:"url"`
+	Type    string      `json:"type"`
+	Id      string      `json:"id"`
+	Payload interface{} `json:"payload"`
 }
 
 type NilParser struct{}
